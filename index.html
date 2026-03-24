@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechTalk AI - Practice Tech Interviews</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .question-type {
+            margin-bottom: 20px;
+        }
+
+        .question-type label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .question-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-recording {
+            background: #ef4444;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .feedback-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .clarity-score {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            font-size: 32px;
+            color: #fbbf24;
+            margin: 10px 0;
+        }
+
+        .feedback-section {
+            margin-bottom: 20px;
+        }
+
+        .feedback-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .feedback-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feedback-section li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feedback-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .improvements li:before {
+            content: "→";
+            color: #f59e0b;
+        }
+
+        .feedback-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .transcription-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 2px dashed #e0e0e0;
+            min-height: 100px;
+        }
+
+        .transcription-text {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 TechTalk AI</h1>
+        <p class="subtitle">Practice Tech Interviews Out Loud</p>
+
+        <!-- Selector de tipo de pregunta -->
+        <div class="question-type">
+            <label for="questionType">Tipo de pregunta:</label>
+            <select id="questionType">
+                <option value="behavioral">Behavioral (Cuéntame sobre...)</option>
+                <option value="coding">Coding (Explica cómo resolverías...)</option>
+                <option value="system_design">System Design (Diseña un sistema...)</option>
+            </select>
+        </div>
+
+        <!-- Caja de pregunta -->
+        <div class="question-box">
+            <p class="question-text" id="questionText">Click "Nueva Pregunta" para empezar</p>
+        </div>
+
+        <!-- Controles -->
+        <div class="controls">
+            <button class="btn-secondary" id="newQuestionBtn">Nueva Pregunta</button>
+            <button class="btn-primary" id="recordBtn">🎤 Grabar Respuesta</button>
+        </div>
+
+        <!-- Status -->
+        <div id="status" class="status hidden"></div>
+
+        <!-- Transcripción -->
+        <div id="transcriptionBox" class="transcription-box hidden">
+            <strong>Tu respuesta:</strong>
+            <p class="transcription-text" id="transcriptionText"></p>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px;">Analizando tu respuesta...</p>
+        </div>
+
+        <!-- Feedback -->
+        <div id="feedbackBox" class="feedback-box hidden">
+            <div class="clarity-score">
+                <h3>Claridad de tu respuesta</h3>
+                <div class="stars" id="stars"></div>
+                <p id="scoreText"></p>
+            </div>
+
+            <div class="feedback-section">
+                <h3>✅ Lo que hiciste bien:</h3>
+                <ul id="strengthsList"></ul>
+            </div>
+
+            <div class="feedback-section improvements">
+                <h3>💡 Áreas para mejorar:</h3>
+                <ul id="improvementsList"></ul>
+            </div>
+
+            <div class="feedback-text">
+                <strong>Feedback:</strong>
+                <p id="feedbackText"></p>
+            </div>
+
+            <button class="btn-primary" id="tryAgainBtn" style="margin-top: 20px; width: 100%;">
+                Probar Otra Pregunta
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ IMPORTANTE: Cambia esta URL a tu backend de Railway
+        const API_URL = 'https://techtalk-ai-backend-production.up.railway.app/';
+        
+        // Estado
+        let currentQuestion = '';
+        let isRecording = false;
+        let recognition;
+
+        // Elementos DOM
+        const questionTypeSelect = document.getElementById('questionType');
+        const questionText = document.getElementById('questionText');
+        const newQuestionBtn = document.getElementById('newQuestionBtn');
+        const recordBtn = document.getElementById('recordBtn');
+        const status = document.getElementById('status');
+        const transcriptionBox = document.getElementById('transcriptionBox');
+        const transcriptionText = document.getElementById('transcriptionText');
+        const loading = document.getElementById('loading');
+        const feedbackBox = document.getElementById('feedbackBox');
+        const tryAgainBtn = document.getElementById('tryAgainBtn');
+
+        // Inicializar Web Speech API
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join(' ');
+                
+                transcriptionText.textContent = transcript;
+                transcriptionBox.classList.remove('hidden');
+            };
+
+            recognition.onerror = (event) => {
+                showStatus('Error: ' + event.error, 'error');
+                stopRecording();
+            };
+        } else {
+            alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.');
+        }
+
+        // Event Listeners
+        newQuestionBtn.addEventListener('click', getNewQuestion);
+        recordBtn.addEventListener('click', toggleRecording);
+        tryAgainBtn.addEventListener('click', resetInterview);
+
+        // Funciones
+        async function getNewQuestion() {
+            const type = questionTypeSelect.value;
+            try {
+                const response = await fetch(`${API_URL}/api/question/${type}`);
+                const data = await response.json();
+                currentQuestion = data.question;
+                questionText.textContent = currentQuestion;
+                resetFeedback();
+                showStatus('Pregunta cargada. Click en "Grabar Respuesta" cuando estés listo/a.', 'info');
+            } catch (error) {
+                showStatus('Error al cargar pregunta. Verifica que el backend esté corriendo.', 'error');
+                console.error(error);
+            }
+        }
+
+        function toggleRecording() {
+            if (!currentQuestion) {
+                showStatus('Primero selecciona una pregunta nueva', 'error');
+                return;
+            }
+
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            isRecording = true;
+            recordBtn.textContent = '⏹️ Detener Grabación';
+            recordBtn.classList.remove('btn-primary');
+            recordBtn.classList.add('btn-recording');
+            showStatus('🎤 Grabando... Habla tu respuesta', 'info');
+            transcriptionText.textContent = '';
+            transcriptionBox.classList.add('hidden');
+            recognition.start();
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            recordBtn.textContent = '🎤 Grabar Respuesta';
+            recordBtn.classList.remove('btn-recording');
+            recordBtn.classList.add('btn-primary');
+            recognition.stop();
+            
+            const transcript = transcriptionText.textContent;
+            if (transcript) {
+                getFeedback(transcript);
+            } else {
+                showStatus('No se detectó audio. Intenta de nuevo.', 'error');
+            }
+        }
+
+        async function getFeedback(transcript) {
+            loading.classList.remove('hidden');
+            status.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_URL}/api/feedback`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_response: transcript,
+                        question_type: questionTypeSelect.value
+                    })
+                });
+
+                const data = await response.json();
+                displayFeedback(data);
+            } catch (error) {
+                showStatus('Error al obtener feedback. Intenta de nuevo.', 'error');
+                console.error(error);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function displayFeedback(data) {
+            // Stars
+            const stars = '⭐'.repeat(data.clarity_score) + '☆'.repeat(5 - data.clarity_score);
+            document.getElementById('stars').textContent = stars;
+            document.getElementById('scoreText').textContent = `${data.clarity_score}/5`;
+
+            // Strengths
+            const strengthsList = document.getElementById('strengthsList');
+            strengthsList.innerHTML = data.strengths.map(s => `<li>${s}</li>`).join('');
+
+            // Improvements
+            const improvementsList = document.getElementById('improvementsList');
+            improvementsList.innerHTML = data.improvements.map(i => `<li>${i}</li>`).join('');
+
+            // Feedback text
+            document.getElementById('feedbackText').textContent = data.feedback;
+
+            // Show feedback box
+            feedbackBox.classList.remove('hidden');
+            showStatus('✅ Feedback generado!', 'success');
+        }
+
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.classList.remove('hidden');
+        }
+
+        function resetFeedback() {
+            feedbackBox.classList.add('hidden');
+            transcriptionBox.classList.add('hidden');
+            status.classList.add('hidden');
+        }
+
+        function resetInterview() {
+            resetFeedback();
+            getNewQuestion();
+        }
+
+        // Cargar primera pregunta al inicio
+        window.addEventListener('load', () => {
+            showStatus('¡Bienvenido/a! Selecciona el tipo de pregunta y click en "Nueva Pregunta"', 'info');
+        });
+    </script>
+</body>
+</html>
