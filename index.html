@@ -296,6 +296,9 @@
                 <option value="behavioral" id="opt-behavioral">Behavioral (Cuéntame sobre...)</option>
                 <option value="coding" id="opt-coding">Coding (Explica cómo resolverías...)</option>
                 <option value="system_design" id="opt-system">System Design (Diseña un sistema...)</option>
+                <option value="data_engineering" id="opt-data">Data Engineering (ETL, Spark, Pipelines...)</option>
+                <option value="machine_learning" id="opt-ml">Machine Learning (Modelos, Features...)</option>
+                <option value="sql_databases" id="opt-sql">SQL & Databases (Queries, Optimización...)</option>
             </select>
         </div>
 
@@ -372,6 +375,9 @@
                 optBehavioral: "Behavioral (Cuéntame sobre...)",
                 optCoding: "Coding (Explica cómo resolverías...)",
                 optSystem: "System Design (Diseña un sistema...)",
+                optData: "Data Engineering (ETL, Spark, Pipelines...)",
+                optMl: "Machine Learning (Modelos, Features...)",
+                optSql: "SQL & Databases (Queries, Optimización...)",
                 btnNew: "Nueva Pregunta",
                 btnRecord: "🎤 Grabar Respuesta",
                 btnStop: "⏹️ Detener Grabación",
@@ -398,6 +404,9 @@
                 optBehavioral: "Behavioral (Tell me about...)",
                 optCoding: "Coding (Explain how you would...)",
                 optSystem: "System Design (Design a system...)",
+                optData: "Data Engineering (ETL, Spark, Pipelines...)",
+                optMl: "Machine Learning (Models, Features...)",
+                optSql: "SQL & Databases (Queries, Optimization...)",
                 btnNew: "New Question",
                 btnRecord: "🎤 Record Answer",
                 btnStop: "⏹️ Stop Recording",
@@ -515,6 +524,9 @@
             document.getElementById('opt-behavioral').textContent = t.optBehavioral;
             document.getElementById('opt-coding').textContent = t.optCoding;
             document.getElementById('opt-system').textContent = t.optSystem;
+            document.getElementById('opt-data').textContent = t.optData;
+            document.getElementById('opt-ml').textContent = t.optMl;
+            document.getElementById('opt-sql').textContent = t.optSql;
             newQuestionBtn.textContent = t.btnNew;
             recordBtn.textContent = t.btnRecord;
             document.getElementById('label-response').textContent = t.labelResponse;
