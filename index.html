@@ -356,7 +356,7 @@
 
     <script>
         // ⚠️ IMPORTANTE: Cambia esta URL a tu backend de Railway
-        const API_URL = 'https://techtalk-ai-backend-production.up.railway.app';
+        const API_URL = 'PEGA_TU_URL_DE_RAILWAY_AQUI';
         
         // Estado
         let currentLanguage = 'es';
@@ -450,9 +450,37 @@
                     transcriptionBox.classList.remove('hidden');
                 };
 
+                recognition.onend = () => {
+                    // Cuando termina el reconocimiento
+                    if (isRecording) {
+                        isRecording = false;
+                        recordBtn.textContent = UI_TEXT[currentLanguage].btnRecord;
+                        recordBtn.classList.remove('btn-recording');
+                        recordBtn.classList.add('btn-primary');
+                    }
+                    
+                    // Dar más tiempo en iOS/Safari para que llegue la transcripción
+                    setTimeout(() => {
+                        const transcript = transcriptionText.textContent.trim();
+                        if (transcript && transcript.length > 0) {
+                            // Hay transcripción - enviar feedback
+                            getFeedback(transcript);
+                        } else {
+                            // Solo mostrar error si realmente NO hay nada
+                            // Y si la caja de transcripción no está visible
+                            if (transcriptionBox.classList.contains('hidden')) {
+                                showStatus(UI_TEXT[currentLanguage].noAudio, 'error');
+                            }
+                        }
+                    }, 500); // Aumentado a 500ms para iOS
+                };
+
                 recognition.onerror = (event) => {
                     showStatus('Error: ' + event.error, 'error');
-                    stopRecording();
+                    isRecording = false;
+                    recordBtn.textContent = UI_TEXT[currentLanguage].btnRecord;
+                    recordBtn.classList.remove('btn-recording');
+                    recordBtn.classList.add('btn-primary');
                 };
             } else {
                 alert('Your browser does not support voice recognition. Use Chrome or Edge.');
@@ -556,14 +584,19 @@
             recordBtn.textContent = t.btnRecord;
             recordBtn.classList.remove('btn-recording');
             recordBtn.classList.add('btn-primary');
+            
+            // Detener reconocimiento
             recognition.stop();
             
-            const transcript = transcriptionText.textContent;
-            if (transcript) {
-                getFeedback(transcript);
-            } else {
-                showStatus(t.noAudio, 'error');
-            }
+            // En iOS/Safari, a veces onend no captura la transcripción a tiempo
+            // Damos un momento extra y verificamos si hay transcripción
+            setTimeout(() => {
+                const transcript = transcriptionText.textContent.trim();
+                // Si hay transcripción visible, enviarla
+                if (!transcriptionBox.classList.contains('hidden') && transcript) {
+                    getFeedback(transcript);
+                }
+            }, 300);
         }
 
         async function getFeedback(transcript) {
