@@ -43,6 +43,33 @@
             margin-bottom: 30px;
         }
 
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+        }
+
         .question-type {
             margin-bottom: 20px;
         }
@@ -254,15 +281,21 @@
 <body>
     <div class="container">
         <h1>🎤 TechTalk AI</h1>
-        <p class="subtitle">Practice Tech Interviews Out Loud</p>
+        <p class="subtitle" id="subtitle">Practice Tech Interviews Out Loud</p>
+
+        <!-- Selector de idioma -->
+        <div class="language-selector">
+            <button class="lang-btn active" onclick="setLanguage('es')" id="btn-es">🇪🇸 Español</button>
+            <button class="lang-btn" onclick="setLanguage('en')" id="btn-en">🇺🇸 English</button>
+        </div>
 
         <!-- Selector de tipo de pregunta -->
         <div class="question-type">
-            <label for="questionType">Tipo de pregunta:</label>
+            <label for="questionType" id="label-type">Tipo de pregunta:</label>
             <select id="questionType">
-                <option value="behavioral">Behavioral (Cuéntame sobre...)</option>
-                <option value="coding">Coding (Explica cómo resolverías...)</option>
-                <option value="system_design">System Design (Diseña un sistema...)</option>
+                <option value="behavioral" id="opt-behavioral">Behavioral (Cuéntame sobre...)</option>
+                <option value="coding" id="opt-coding">Coding (Explica cómo resolverías...)</option>
+                <option value="system_design" id="opt-system">System Design (Diseña un sistema...)</option>
             </select>
         </div>
 
@@ -282,36 +315,36 @@
 
         <!-- Transcripción -->
         <div id="transcriptionBox" class="transcription-box hidden">
-            <strong>Tu respuesta:</strong>
+            <strong id="label-response">Tu respuesta:</strong>
             <p class="transcription-text" id="transcriptionText"></p>
         </div>
 
         <!-- Loading -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
-            <p style="margin-top: 10px;">Analizando tu respuesta...</p>
+            <p style="margin-top: 10px;" id="loading-text">Analizando tu respuesta...</p>
         </div>
 
         <!-- Feedback -->
         <div id="feedbackBox" class="feedback-box hidden">
             <div class="clarity-score">
-                <h3>Claridad de tu respuesta</h3>
+                <h3 id="clarity-title">Claridad de tu respuesta</h3>
                 <div class="stars" id="stars"></div>
                 <p id="scoreText"></p>
             </div>
 
             <div class="feedback-section">
-                <h3>✅ Lo que hiciste bien:</h3>
+                <h3 id="strengths-title">✅ Lo que hiciste bien:</h3>
                 <ul id="strengthsList"></ul>
             </div>
 
             <div class="feedback-section improvements">
-                <h3>💡 Áreas para mejorar:</h3>
+                <h3 id="improvements-title">💡 Áreas para mejorar:</h3>
                 <ul id="improvementsList"></ul>
             </div>
 
             <div class="feedback-text">
-                <strong>Feedback:</strong>
+                <strong id="feedback-label">Feedback:</strong>
                 <p id="feedbackText"></p>
             </div>
 
@@ -323,12 +356,69 @@
 
     <script>
         // ⚠️ IMPORTANTE: Cambia esta URL a tu backend de Railway
-        const API_URL = 'https://techtalk-ai-backend-production.up.railway.app';
+        const API_URL = 'PEGA_TU_URL_DE_RAILWAY_AQUI';
         
         // Estado
+        let currentLanguage = 'es';
         let currentQuestion = '';
         let isRecording = false;
         let recognition;
+
+        // Textos UI en ambos idiomas
+        const UI_TEXT = {
+            es: {
+                subtitle: "Practice Tech Interviews Out Loud",
+                labelType: "Tipo de pregunta:",
+                optBehavioral: "Behavioral (Cuéntame sobre...)",
+                optCoding: "Coding (Explica cómo resolverías...)",
+                optSystem: "System Design (Diseña un sistema...)",
+                btnNew: "Nueva Pregunta",
+                btnRecord: "🎤 Grabar Respuesta",
+                btnStop: "⏹️ Detener Grabación",
+                clickNew: "Click \"Nueva Pregunta\" para empezar",
+                questionLoaded: "Pregunta cargada. Click en \"Grabar Respuesta\" cuando estés listo/a.",
+                recording: "🎤 Grabando... Habla tu respuesta",
+                selectFirst: "Primero selecciona una pregunta nueva",
+                noAudio: "No se detectó audio. Intenta de nuevo.",
+                analyzing: "Analizando tu respuesta...",
+                errorQuestion: "Error al cargar pregunta. Verifica que el backend esté corriendo.",
+                errorFeedback: "Error al obtener feedback. Intenta de nuevo.",
+                labelResponse: "Tu respuesta:",
+                clarityTitle: "Claridad de tu respuesta",
+                strengthsTitle: "✅ Lo que hiciste bien:",
+                improvementsTitle: "💡 Áreas para mejorar:",
+                feedbackLabel: "Feedback:",
+                btnTryAgain: "Probar Otra Pregunta",
+                feedbackDone: "✅ Feedback generado!",
+                welcome: "¡Bienvenido/a! Selecciona el tipo de pregunta y click en \"Nueva Pregunta\""
+            },
+            en: {
+                subtitle: "Practice Tech Interviews Out Loud",
+                labelType: "Question type:",
+                optBehavioral: "Behavioral (Tell me about...)",
+                optCoding: "Coding (Explain how you would...)",
+                optSystem: "System Design (Design a system...)",
+                btnNew: "New Question",
+                btnRecord: "🎤 Record Answer",
+                btnStop: "⏹️ Stop Recording",
+                clickNew: "Click \"New Question\" to start",
+                questionLoaded: "Question loaded. Click \"Record Answer\" when ready.",
+                recording: "🎤 Recording... Speak your answer",
+                selectFirst: "First select a new question",
+                noAudio: "No audio detected. Try again.",
+                analyzing: "Analyzing your response...",
+                errorQuestion: "Error loading question. Check that backend is running.",
+                errorFeedback: "Error getting feedback. Try again.",
+                labelResponse: "Your response:",
+                clarityTitle: "Clarity of your response",
+                strengthsTitle: "✅ What you did well:",
+                improvementsTitle: "💡 Areas to improve:",
+                feedbackLabel: "Feedback:",
+                btnTryAgain: "Try Another Question",
+                feedbackDone: "✅ Feedback generated!",
+                welcome: "Welcome! Select question type and click \"New Question\""
+            }
+        };
 
         // Elementos DOM
         const questionTypeSelect = document.getElementById('questionType');
@@ -343,28 +433,69 @@
         const tryAgainBtn = document.getElementById('tryAgainBtn');
 
         // Inicializar Web Speech API
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
-            recognition.continuous = true;
-            recognition.interimResults = false;
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = currentLanguage === 'es' ? 'es-ES' : 'en-US';
+                recognition.continuous = true;
+                recognition.interimResults = false;
 
-            recognition.onresult = (event) => {
-                const transcript = Array.from(event.results)
-                    .map(result => result[0].transcript)
-                    .join(' ');
-                
-                transcriptionText.textContent = transcript;
-                transcriptionBox.classList.remove('hidden');
-            };
+                recognition.onresult = (event) => {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0].transcript)
+                        .join(' ');
+                    
+                    transcriptionText.textContent = transcript;
+                    transcriptionBox.classList.remove('hidden');
+                };
 
-            recognition.onerror = (event) => {
-                showStatus('Error: ' + event.error, 'error');
-                stopRecording();
-            };
-        } else {
-            alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.');
+                recognition.onerror = (event) => {
+                    showStatus('Error: ' + event.error, 'error');
+                    stopRecording();
+                };
+            } else {
+                alert('Your browser does not support voice recognition. Use Chrome or Edge.');
+            }
+        }
+
+        // Cambiar idioma
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Actualizar botones activos
+            document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            
+            // Actualizar UI
+            updateUIText();
+            
+            // Reiniciar reconocimiento de voz
+            initSpeechRecognition();
+            
+            // Reset estado
+            resetFeedback();
+            questionText.textContent = UI_TEXT[lang].clickNew;
+        }
+
+        // Actualizar textos de UI
+        function updateUIText() {
+            const t = UI_TEXT[currentLanguage];
+            
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('label-type').textContent = t.labelType;
+            document.getElementById('opt-behavioral').textContent = t.optBehavioral;
+            document.getElementById('opt-coding').textContent = t.optCoding;
+            document.getElementById('opt-system').textContent = t.optSystem;
+            newQuestionBtn.textContent = t.btnNew;
+            recordBtn.textContent = t.btnRecord;
+            document.getElementById('label-response').textContent = t.labelResponse;
+            document.getElementById('loading-text').textContent = t.analyzing;
+            document.getElementById('clarity-title').textContent = t.clarityTitle;
+            document.getElementById('strengths-title').textContent = t.strengthsTitle;
+            document.getElementById('improvements-title').textContent = t.improvementsTitle;
+            document.getElementById('feedback-label').textContent = t.feedbackLabel;
+            tryAgainBtn.textContent = t.btnTryAgain;
         }
 
         // Event Listeners
@@ -375,22 +506,26 @@
         // Funciones
         async function getNewQuestion() {
             const type = questionTypeSelect.value;
+            const t = UI_TEXT[currentLanguage];
+            
             try {
-                const response = await fetch(`${API_URL}/api/question/${type}`);
+                const response = await fetch(`${API_URL}/api/question/${type}?language=${currentLanguage}`);
                 const data = await response.json();
                 currentQuestion = data.question;
                 questionText.textContent = currentQuestion;
                 resetFeedback();
-                showStatus('Pregunta cargada. Click en "Grabar Respuesta" cuando estés listo/a.', 'info');
+                showStatus(t.questionLoaded, 'info');
             } catch (error) {
-                showStatus('Error al cargar pregunta. Verifica que el backend esté corriendo.', 'error');
+                showStatus(t.errorQuestion, 'error');
                 console.error(error);
             }
         }
 
         function toggleRecording() {
+            const t = UI_TEXT[currentLanguage];
+            
             if (!currentQuestion) {
-                showStatus('Primero selecciona una pregunta nueva', 'error');
+                showStatus(t.selectFirst, 'error');
                 return;
             }
 
@@ -402,19 +537,23 @@
         }
 
         function startRecording() {
+            const t = UI_TEXT[currentLanguage];
+            
             isRecording = true;
-            recordBtn.textContent = '⏹️ Detener Grabación';
+            recordBtn.textContent = t.btnStop;
             recordBtn.classList.remove('btn-primary');
             recordBtn.classList.add('btn-recording');
-            showStatus('🎤 Grabando... Habla tu respuesta', 'info');
+            showStatus(t.recording, 'info');
             transcriptionText.textContent = '';
             transcriptionBox.classList.add('hidden');
             recognition.start();
         }
 
         function stopRecording() {
+            const t = UI_TEXT[currentLanguage];
+            
             isRecording = false;
-            recordBtn.textContent = '🎤 Grabar Respuesta';
+            recordBtn.textContent = t.btnRecord;
             recordBtn.classList.remove('btn-recording');
             recordBtn.classList.add('btn-primary');
             recognition.stop();
@@ -423,11 +562,12 @@
             if (transcript) {
                 getFeedback(transcript);
             } else {
-                showStatus('No se detectó audio. Intenta de nuevo.', 'error');
+                showStatus(t.noAudio, 'error');
             }
         }
 
         async function getFeedback(transcript) {
+            const t = UI_TEXT[currentLanguage];
             loading.classList.remove('hidden');
             status.classList.add('hidden');
 
@@ -439,14 +579,15 @@
                     },
                     body: JSON.stringify({
                         user_response: transcript,
-                        question_type: questionTypeSelect.value
+                        question_type: questionTypeSelect.value,
+                        language: currentLanguage
                     })
                 });
 
                 const data = await response.json();
                 displayFeedback(data);
             } catch (error) {
-                showStatus('Error al obtener feedback. Intenta de nuevo.', 'error');
+                showStatus(t.errorFeedback, 'error');
                 console.error(error);
             } finally {
                 loading.classList.add('hidden');
@@ -454,6 +595,8 @@
         }
 
         function displayFeedback(data) {
+            const t = UI_TEXT[currentLanguage];
+            
             // Stars
             const stars = '⭐'.repeat(data.clarity_score) + '☆'.repeat(5 - data.clarity_score);
             document.getElementById('stars').textContent = stars;
@@ -472,7 +615,7 @@
 
             // Show feedback box
             feedbackBox.classList.remove('hidden');
-            showStatus('✅ Feedback generado!', 'success');
+            showStatus(t.feedbackDone, 'success');
         }
 
         function showStatus(message, type) {
@@ -492,9 +635,11 @@
             getNewQuestion();
         }
 
-        // Cargar primera pregunta al inicio
+        // Inicializar
         window.addEventListener('load', () => {
-            showStatus('¡Bienvenido/a! Selecciona el tipo de pregunta y click en "Nueva Pregunta"', 'info');
+            initSpeechRecognition();
+            const t = UI_TEXT[currentLanguage];
+            showStatus(t.welcome, 'info');
         });
     </script>
 </body>
